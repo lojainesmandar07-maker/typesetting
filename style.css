@@ -1,0 +1,219 @@
+:root {
+  --bg: #f5f2ee;
+  --surface: #fffaf5;
+  --surface-strong: #ffffff;
+  --text: #272220;
+  --muted: #756e67;
+  --accent: #b45f40;
+  --accent-soft: #f3d9cf;
+  --border: #e5ddd6;
+  --success: #2f8b57;
+  --shadow: 0 12px 30px rgba(32, 20, 14, 0.08);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Cairo', system-ui, sans-serif;
+  line-height: 1.5;
+}
+
+.container {
+  max-width: 980px;
+  margin: 0 auto;
+  padding: 24px 18px 48px;
+}
+
+.page-header h1 {
+  margin: 0;
+  font-family: 'Fraunces', serif;
+  font-size: clamp(1.8rem, 4vw, 2.5rem);
+  letter-spacing: 0.3px;
+}
+
+.page-header p {
+  margin-top: 8px;
+  color: var(--muted);
+}
+
+.card {
+  margin-top: 18px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  box-shadow: var(--shadow);
+  padding: 18px;
+}
+
+label {
+  display: block;
+  font-size: 0.95rem;
+  margin-bottom: 8px;
+}
+
+textarea {
+  width: 100%;
+  min-height: 220px;
+  resize: vertical;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 14px;
+  font-family: inherit;
+  font-size: 1rem;
+  background: var(--surface-strong);
+  color: var(--text);
+}
+
+textarea:focus,
+select:focus,
+button:focus {
+  outline: 2px solid var(--accent-soft);
+  outline-offset: 2px;
+}
+
+.controls {
+  margin-top: 12px;
+  display: grid;
+  gap: 10px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  align-items: end;
+}
+
+select,
+.btn {
+  width: 100%;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  padding: 10px 12px;
+  font-size: 0.95rem;
+  font-family: inherit;
+}
+
+.btn {
+  cursor: pointer;
+  background: var(--surface-strong);
+}
+
+.btn.primary {
+  background: var(--accent);
+  color: white;
+  border-color: var(--accent);
+}
+
+.btn.ghost:hover,
+.btn.primary:hover {
+  opacity: 0.92;
+}
+
+.results {
+  margin-top: 24px;
+  display: grid;
+  gap: 14px;
+}
+
+.result-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 14px;
+  box-shadow: var(--shadow);
+  opacity: 0;
+  transform: translateY(8px);
+  animation: reveal 260ms ease forwards;
+}
+
+@keyframes reveal {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.original {
+  color: var(--muted);
+  font-size: 0.93rem;
+  margin-bottom: 10px;
+}
+
+.block {
+  border-top: 1px dashed var(--border);
+  padding-top: 10px;
+  margin-top: 10px;
+}
+
+.block strong {
+  display: inline-block;
+  margin-bottom: 8px;
+}
+
+.suggestion {
+  background: var(--surface-strong);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 12px;
+  white-space: pre-line;
+  margin-bottom: 8px;
+  cursor: pointer;
+}
+
+.best .suggestion {
+  border-color: var(--accent);
+  background: #fff7f2;
+}
+
+.inline {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.copy-btn {
+  border: 1px solid var(--border);
+  background: white;
+  border-radius: 8px;
+  padding: 6px 10px;
+  cursor: pointer;
+  font-size: 0.85rem;
+}
+
+.card-ltr {
+  direction: ltr;
+  text-align: left;
+}
+
+.toast {
+  position: fixed;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--success);
+  color: white;
+  padding: 9px 14px;
+  border-radius: 999px;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 180ms ease;
+}
+
+.toast.show {
+  opacity: 1;
+}
+
+@media (max-width: 720px) {
+  .controls {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* TODO: Presets لأشكال الفقاعات المختلفة */
+/* TODO: Font size presets (صغير / متوسط / كبير) */
+/* TODO: معاينة بصرية تقريبية للفقاعة */
+/* TODO: Copy All لنسخ كل النتائج دفعة واحدة */
+/* TODO: حفظ إعدادات اللغة والشكل في localStorage */
+/* TODO: استيراد ملف نصي كامل */
