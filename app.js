@@ -7,88 +7,155 @@
   const sampleBtn = document.getElementById('sampleBtn');
   const results = document.getElementById('results');
   const toast = document.getElementById('toast');
+  const compactToggle = document.getElementById('compactToggle');
+  const collapseBtn = document.getElementById('collapseBtn');
 
-  const sample = `القائد قد تصدى وحده لجميع الموتى الذين كانوا في الساحة
-وعدتني ساحلاً
-أشعر أن المشاعر أدفن في أعماق قلبي
-I can't believe you're actually here
-The war is finally over`;
-
-  function showToast(message) {
-    toast.textContent = message;
-    toast.classList.add('show');
-    clearTimeout(showToast._timer);
-    showToast._timer = setTimeout(() => {
-      toast.classList.remove('show');
-    }, 1500);
-  }
-
-  async function copyText(value) {
-    try {
-      await navigator.clipboard.writeText(value);
-      showToast('تم النسخ ✓');
-    } catch {
-      showToast('تعذر النسخ');
+  function loadSettings() {
+    const saved = JSON.parse(localStorage.getItem('bubbleLinerSettings') || '{}');
+    if (saved.lang) languageSelect.value = saved.lang;
+    if (saved.shape) shapeSelect.value = saved.shape;
+    if (saved.compact) {
+      document.body.classList.add('compact-mode');
+      compactToggle.textContent = '↩️ وضع عادي';
+    }
+    if (saved.collapsed) {
+      document.body.classList.add('settings-collapsed');
+      collapseBtn.textContent = 'إظهار الإعدادات';
     }
   }
 
-  function makeBlock(title, text, extraClass = '') {
-    const block = document.createElement('div');
-    block.className = `block ${extraClass}`.trim();
+  function saveSettings() {
+    localStorage.setItem(
+      'bubbleLinerSettings',
+      JSON.stringify({
+        lang: languageSelect.value,
+        shape: shapeSelect.value,
+        compact: document.body.classList.contains('compact-mode'),
+        collapsed: document.body.classList.contains('settings-collapsed'),
+      })
+    );
+  }
 
-    const row = document.createElement('div');
-    row.className = 'inline';
+  function showToast(msg) {
+    toast.textContent = msg;
+    toast.classList.add('show');
+    clearTimeout(showToast._t);
+    showToast._t = setTimeout(() => toast.classList.remove('show'), 1500);
+  }
 
-    const label = document.createElement('strong');
-    label.textContent = title;
+  async function copyText(text) {
+    try {
+      await navigator.clipboard.writeText(text);
+      showToast('تم النسخ ✓');
+    } catch {
+      showToast('تعذّر النسخ');
+    }
+  }
 
-    const btn = document.createElement('button');
-    btn.className = 'copy-btn';
-    btn.type = 'button';
-    btn.textContent = 'نسخ 📋';
-    btn.addEventListener('click', () => copyText(text));
+  function makeCard(original, out, index) {
+    const allOptions = [out.best, ...out.alternatives].filter((v, i, arr) => v && arr.indexOf(v) === i);
+    let currentIdx = 0;
 
-    row.append(label, btn);
+    const card = document.createElement('article');
+    card.className = 'result-card';
+    card.style.animationDelay = `${index * 40}ms`;
+    if (out.lang === 'en') card.classList.add('card-ltr');
 
-    const suggestion = document.createElement('div');
-    suggestion.className = 'suggestion';
-    suggestion.textContent = text;
-    suggestion.title = 'اضغطي للنسخ';
-    suggestion.addEventListener('click', () => copyText(text));
+    const origEl = document.createElement('div');
+    origEl.className = 'original';
+    origEl.textContent = original;
 
-    block.append(row, suggestion);
-    return block;
+    const suggestionEl = document.createElement('div');
+    suggestionEl.className = 'suggestion-main';
+    suggestionEl.textContent = allOptions[currentIdx] || '';
+
+    const btnRow = document.createElement('div');
+    btnRow.className = 'btn-row';
+
+    const copyBtn = document.createElement('button');
+    copyBtn.className = 'copy-btn';
+    copyBtn.type = 'button';
+    copyBtn.textContent = 'نسخ ✓';
+
+    const altBtn = document.createElement('button');
+    altBtn.className = 'alt-btn';
+    altBtn.type = 'button';
+    altBtn.textContent = allOptions.length > 1 ? `بديل 1/${allOptions.length} ←` : 'بديل';
+    altBtn.disabled = allOptions.length <= 1;
+
+    function renderOption() {
+      suggestionEl.textContent = allOptions[currentIdx] || '';
+      if (allOptions.length > 1) {
+        altBtn.textContent = `بديل ${currentIdx + 1}/${allOptions.length} ←`;
+      }
+    }
+
+    suggestionEl.addEventListener('click', () => copyText(allOptions[currentIdx] || ''));
+
+    card.addEventListener('click', (event) => {
+      if (event.target.closest('button')) return;
+      copyText(allOptions[currentIdx] || '');
+    });
+
+    copyBtn.addEventListener('click', (event) => {
+      event.stopPropagation();
+      copyText(allOptions[currentIdx] || '');
+    });
+
+    altBtn.addEventListener('click', (event) => {
+      event.stopPropagation();
+      currentIdx = (currentIdx + 1) % allOptions.length;
+      renderOption();
+    });
+
+    btnRow.append(copyBtn, altBtn);
+    card.append(origEl, suggestionEl, btnRow);
+    return card;
   }
 
   function processText() {
-    const bubbles = window.splitIntoBubbles(inputText.value);
+    const rawBubbles = window.splitIntoBubbles(inputText.value);
     results.innerHTML = '';
-    if (!bubbles.length) return;
+    if (!rawBubbles.length) return;
 
-    bubbles.forEach((bubble, index) => {
-      const card = document.createElement('article');
-      card.className = 'result-card';
-      card.style.animationDelay = `${index * 40}ms`;
+    const defaultShape = shapeSelect.value;
+    const defaultLang = languageSelect.value;
 
-      const forcedLang = languageSelect.value;
-      const out = window.formatBubble(bubble, forcedLang, shapeSelect.value);
-
-      if (out.lang === 'en') {
-        card.classList.add('card-ltr');
-      }
-
-      const original = document.createElement('div');
-      original.className = 'original';
-      original.textContent = bubble;
-
-      card.append(original);
-      card.append(makeBlock('✨ أفضل اقتراح', out.best, 'best'));
-      card.append(makeBlock('بديل 1', out.alternatives[0]));
-      card.append(makeBlock('بديل 2', out.alternatives[1]));
-
+    rawBubbles.forEach((bubble, i) => {
+      const shape = bubble.shape || defaultShape;
+      const out = window.formatBubble(bubble.text, defaultLang, shape);
+      const card = makeCard(bubble.text, out, i);
       results.append(card);
     });
   }
+
+  [languageSelect, shapeSelect].forEach((el) => {
+    el.addEventListener('change', () => {
+      saveSettings();
+      processText();
+    });
+  });
+
+  compactToggle.addEventListener('click', () => {
+    document.body.classList.toggle('compact-mode');
+    const compact = document.body.classList.contains('compact-mode');
+    compactToggle.textContent = compact ? '↩️ وضع عادي' : '🖥️ وضع الفوتوشوب';
+    saveSettings();
+  });
+
+  collapseBtn.addEventListener('click', () => {
+    document.body.classList.toggle('settings-collapsed');
+    collapseBtn.textContent = document.body.classList.contains('settings-collapsed')
+      ? 'إظهار الإعدادات'
+      : 'إخفاء الإعدادات';
+    saveSettings();
+  });
+
+  let debounceTimer;
+  inputText.addEventListener('input', () => {
+    clearTimeout(debounceTimer);
+    debounceTimer = setTimeout(processText, 300);
+  });
 
   processBtn.addEventListener('click', processText);
 
@@ -99,14 +166,22 @@ The war is finally over`;
   });
 
   sampleBtn.addEventListener('click', () => {
-    inputText.value = sample;
-    inputText.focus();
+    inputText.value = `[c] القائد قد تصدى وحده لجميع الموتى الذين كانوا في الساحة
+[o] وعدتني ساحلاً
+[b] الاسم: كيانو ريفز
+أشعر أن المشاعر تتراكم في أعماق قلبي
+[c] I can't believe you're actually here
+The war is finally over`;
+    processText();
   });
 
-  inputText.addEventListener('keydown', (event) => {
-    if (event.key === 'Enter' && event.ctrlKey) {
-      event.preventDefault();
+  inputText.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' && e.ctrlKey) {
+      e.preventDefault();
       processText();
     }
   });
+
+  loadSettings();
+  processText();
 })();

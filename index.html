@@ -1,64 +1,56 @@
 <!doctype html>
 <html lang="ar" dir="rtl">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Bubble Liner — Arabic/English Manga Typesetting Helper</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&family=Fraunces:opsz,wght@9..144,500;9..144,700&display=swap"
-      rel="stylesheet"
-    />
-    <link rel="stylesheet" href="style.css" />
-  </head>
-  <body>
-    <main class="container">
-      <header class="page-header">
-        <h1>Bubble Liner</h1>
-        <p>مساعد تنسيق فقاعات المانهوا/المانغا — اقتراح تقسيم ذكي للأسطر بضغطة واحدة.</p>
-      </header>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Bubble Liner — تنسيق فقاعات المانهوا</title>
+  <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <button class="compact-toggle" id="compactToggle">🖥️ وضع الفوتوشوب</button>
 
-      <section class="input-panel card">
-        <label for="inputText">النص</label>
-        <textarea
-          id="inputText"
-          autofocus
-          placeholder="الصق ترجمتك هنا — كل سطر جديد = فقاعة مستقلة"
-        ></textarea>
+  <main class="container">
+    <header class="page-header">
+      <h1>Bubble Liner</h1>
+      <p class="subtitle">اكتبي أو الصقي — النتائج تظهر فوراً</p>
+    </header>
 
-        <div class="controls">
-          <label>
-            اللغة
-            <select id="languageSelect">
-              <option value="auto">Auto</option>
-              <option value="ar">العربية</option>
-              <option value="en">English</option>
-            </select>
-          </label>
+    <section class="input-panel card">
+      <textarea
+        id="inputText"
+        autofocus
+        placeholder="الصق ترجمتك هنا — كل سطر = فقاعة&#10;[c] دائرة | [o] بيضاوي | [b] مربع | [w] مستطيل عريض&#10;بدون tag = دائرة تلقائياً"
+      ></textarea>
 
-          <label>
-            شكل الفقاعة
-            <select id="shapeSelect">
-              <option value="circle">Circle</option>
-              <option value="oval">Oval</option>
-              <option value="box">Box</option>
-              <option value="wide-box">Wide Box</option>
-            </select>
-          </label>
+      <div class="controls" id="controlsBar">
+        <select id="languageSelect" title="اللغة الافتراضية">
+          <option value="auto">🌐 Auto</option>
+          <option value="ar">العربية</option>
+          <option value="en">English</option>
+        </select>
 
-          <button id="processBtn" class="btn primary">معالجة (Ctrl+Enter)</button>
-          <button id="clearBtn" class="btn ghost">Clear</button>
-          <button id="sampleBtn" class="btn ghost">Use Sample</button>
-        </div>
-      </section>
+        <select id="shapeSelect" title="شكل الفقاعة الافتراضي">
+          <option value="circle">○ Circle</option>
+          <option value="oval">⬭ Oval</option>
+          <option value="box">□ Box</option>
+          <option value="wide-box">▭ Wide Box</option>
+        </select>
 
-      <section id="results" class="results" aria-live="polite"></section>
-    </main>
+        <button id="processBtn" class="btn primary">معالجة ⌨️ Ctrl+Enter</button>
+        <button id="sampleBtn" class="btn ghost">مثال</button>
+        <button id="clearBtn" class="btn ghost">مسح</button>
+      </div>
 
-    <div id="toast" class="toast" role="status" aria-live="assertive"></div>
+      <button id="collapseBtn" class="collapse-btn" type="button">إخفاء الإعدادات</button>
+    </section>
 
-    <script src="formatter.js"></script>
-    <script src="app.js"></script>
-  </body>
+    <section id="results" class="results" aria-live="polite"></section>
+  </main>
+
+  <div id="toast" class="toast" role="status" aria-live="assertive"></div>
+
+  <script src="formatter.js"></script>
+  <script src="app.js"></script>
+</body>
 </html>
